@@ -20,10 +20,12 @@ Aplikasi Point of Sale (POS) modern berbasis web yang dibangun dengan React + Vi
 ### 1. 👥 Authentication & User Role
 - Login Email/Password.
 - **RBAC (Role-Based Access Control)**: 
-  - Admin (Full Akses)
-  - Kasir (Hanya Transaksi)
-  - Gudang (Kelola Stok)
-- Protected Routes & Auto Redirect.
+  - Admin (Full Akses + Kelola User)
+  - Kasir (Point of Sale & Pelanggan)
+  - Gudang (Produk, Pembelian & Supplier)
+- Protected Routes & Auto Redirect sesuai role.
+- **Kelola User** (khusus Admin): tambah user, ubah nama/role, reset password langsung dari aplikasi.
+  Jalankan `supabase_user_management.sql` di Supabase SQL Editor (setelah `supabase_schema.sql`) untuk mengaktifkan fitur ini.
 
 ### 2. 📊 Dashboard
 - Ringkasan penjualan harian.

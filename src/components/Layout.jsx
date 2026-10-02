@@ -13,9 +13,38 @@ import {
   Settings,
   Menu,
   X,
-  Calendar
+  Calendar,
+  UserCog
 } from 'lucide-react'
 import clsx from 'clsx'
+import { canAccess, ROLE_LABELS } from '../utils/roles'
+
+const NAV_SECTIONS = [
+  {
+    title: 'Main Menu',
+    items: [
+      { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+      { to: '/pos', icon: ShoppingCart, label: 'Point of Sale' },
+    ],
+  },
+  {
+    title: 'Inventory',
+    items: [
+      { to: '/products', icon: Package, label: 'Products' },
+      { to: '/purchases', icon: ArrowDownCircle, label: 'Purchases' },
+      { to: '/suppliers', icon: Truck, label: 'Suppliers' },
+    ],
+  },
+  {
+    title: 'Management',
+    items: [
+      { to: '/customers', icon: Users, label: 'Customers' },
+      { to: '/reports', icon: BarChart3, label: 'Reports' },
+      { to: '/users', icon: UserCog, label: 'Kelola User' },
+      { to: '/settings', icon: Settings, label: 'Settings' },
+    ],
+  },
+]
 
 const NavItem = ({ to, icon: Icon, label, onClick }) => {
   const location = useLocation()
@@ -39,7 +68,7 @@ const NavItem = ({ to, icon: Icon, label, onClick }) => {
 }
 
 export default function Layout({ children }) {
-  const { signOut, session } = useAuth()
+  const { signOut, session, profile, role } = useAuth()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [currentDate, setCurrentDate] = useState('')
 
@@ -96,19 +125,20 @@ export default function Layout({ children }) {
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-2 mb-4 overflow-y-auto custom-scrollbar">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-2">Main Menu</div>
-          <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={closeSidebar} />
-          <NavItem to="/pos" icon={ShoppingCart} label="Point of Sale" onClick={closeSidebar} />
-
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-8">Inventory</div>
-          <NavItem to="/products" icon={Package} label="Products" onClick={closeSidebar} />
-          <NavItem to="/purchases" icon={ArrowDownCircle} label="Purchases" onClick={closeSidebar} />
-          <NavItem to="/suppliers" icon={Truck} label="Suppliers" onClick={closeSidebar} />
-
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-4 mt-8">Management</div>
-          <NavItem to="/customers" icon={Users} label="Customers" onClick={closeSidebar} />
-          <NavItem to="/reports" icon={BarChart3} label="Reports" onClick={closeSidebar} />
-          <NavItem to="/settings" icon={Settings} label="Settings" onClick={closeSidebar} />
+          {NAV_SECTIONS.map((section, index) => {
+            const items = section.items.filter(item => canAccess(role, item.to))
+            if (items.length === 0) return null
+            return (
+              <div key={section.title}>
+                <div className={clsx("text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-4", index === 0 ? "mt-2" : "mt-8")}>{section.title}</div>
+                <div className="space-y-1">
+                  {items.map(item => (
+                    <NavItem key={item.to} to={item.to} icon={item.icon} label={item.label} onClick={closeSidebar} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </nav>
 
         <div className="p-4 border-t border-gray-100 bg-white">
@@ -117,7 +147,10 @@ export default function Layout({ children }) {
                 {session?.user?.email?.[0].toUpperCase()}
              </div>
              <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-bold text-gray-800 truncate">Store Admin</p>
+                <p className="text-sm font-bold text-gray-800 truncate">
+                  {profile?.full_name || ROLE_LABELS[role] || 'User'}
+                  <span className="ml-2 align-middle text-[10px] font-bold uppercase tracking-wider text-yellow-700 bg-yellow-100 px-1.5 py-0.5 rounded">{ROLE_LABELS[role]}</span>
+                </p>
                 <p className="text-xs text-gray-500 truncate">{session?.user?.email}</p>
              </div>
           </div>

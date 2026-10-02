@@ -3,6 +3,7 @@ import { AuthProvider } from './hooks/useAuth'
 import Login from './pages/Login'
 import Layout from './components/Layout'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { ROUTE_ROLES } from './utils/roles'
 
 import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
@@ -12,6 +13,19 @@ import Customers from './pages/Customers'
 import Purchases from './pages/Purchases'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
+import Users from './pages/Users'
+
+const PAGES = [
+  { path: '/dashboard', element: <Dashboard /> },
+  { path: '/products', element: <Products /> },
+  { path: '/pos', element: <POS /> },
+  { path: '/suppliers', element: <Suppliers /> },
+  { path: '/customers', element: <Customers /> },
+  { path: '/purchases', element: <Purchases /> },
+  { path: '/reports', element: <Reports /> },
+  { path: '/settings', element: <Settings /> },
+  { path: '/users', element: <Users /> },
+]
 
 function App() {
   return (
@@ -19,70 +33,16 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/products" element={
-            <ProtectedRoute>
-              <Layout>
-                <Products />
-              </Layout>
-            </ProtectedRoute>
-          } />
 
-          <Route path="/pos" element={
-            <ProtectedRoute>
-              <Layout>
-                <POS />
-              </Layout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/suppliers" element={
-            <ProtectedRoute>
-              <Layout>
-                <Suppliers />
-              </Layout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/customers" element={
-            <ProtectedRoute>
-              <Layout>
-                <Customers />
-              </Layout>
-            </ProtectedRoute>
-          } />
-
-           <Route path="/purchases" element={
-            <ProtectedRoute>
-              <Layout>
-                <Purchases />
-              </Layout>
-            </ProtectedRoute>
-          } />
-
-           <Route path="/reports" element={
-            <ProtectedRoute>
-              <Layout>
-                <Reports />
-              </Layout>
-            </ProtectedRoute>
-          } />
-
-           <Route path="/settings" element={
-            <ProtectedRoute>
-              <Layout>
-                <Settings />
-              </Layout>
-            </ProtectedRoute>
-          } />
+          {PAGES.map(({ path, element }) => (
+            <Route key={path} path={path} element={
+              <ProtectedRoute roles={ROUTE_ROLES[path]}>
+                <Layout>
+                  {element}
+                </Layout>
+              </ProtectedRoute>
+            } />
+          ))}
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
